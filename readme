@@ -1,0 +1,59 @@
+WLClassify Algorithm
+	(Underscores indicate subscripts. Subscripts i,j,k are generic, meaning they can have different uses in different statements.)
+
+
+The algorithm WLClassify (short for win/loss classifier) is designed to make successful sports betting style picks.
+
+We assume the contest C has the following components:
+	X: the set of possible players to choose from. 
+		n: size of X, that is, how many players are available to choose from
+		x_i: denotes a single player with label i
+		x: a subset of players that constitutes a single "pick". Could be a team for a fantasy season, The contest must define what a valid pick looks like.
+	S: the set of all sets of past player statistics 
+	S_i: an element of S, the set of past statistics for player i. S_i is an (s0 x y0) matrix with components s_ijk, where:
+		s0: number of statistical categories.
+		y0: number of datapoints for each statistic. Could be years back for compiled season statistics, or single games, etc. This dimension of the data is referred to later as "timestamp" because it will often be a time-based variable.
+		s_ijk: ith player, statistic j, timestamp k. 
+	v(x1, x2): for player subsets (picks) x1 and x2, function v is defined as
+		v=1 if x1 beats x2
+		v=-1 if x2 beats x1
+		v=0 if x1 and x2 are tied, if possible.
+		
+Given contest C, WLClassify will determine how to weight past statistics S has the following hyperparameters:
+	λ: rate of learning 
+	m: number of perturbations to try per iteration. Basically, a batch size parameter.
+	l: number of picks to try for each perturbation, in determining its effectiveness. Also a type of batch size parameter.
+WLClassify has the following variables that change in calculation:
+	U: set of weights, (s0 x y0) matrix. 
+		u_ijk: weight for ith statistic, jth timestamp, kth iteration of algorithm.
+		u_ij: weight for ith statistic, jth timestamp. The final subscript for iteration # is omitted when we're only discussing a single iteration.
+	w_ij: probability of choosing player labeled i on jth iteration of the algorithm. 
+	w_i: probability of choosing player labeled i. (Iteration # omitted).
+	x(w): subset of players (single pick) determined by probability distribution w
+	c_ij: jth perturbation for player i. This is a candidate probability, with the best being used for the next w_i.
+	c_ij': unscaled probability based on U and S
+	c_ij'min; smallest unscaled probability from set of c_ij'.
+	cTot_j: sum over i of c_ij'
+	c_i, c_i, cTot: candidate probability when perturbation # is omitted. 
+	r: random number chosen from [-1, 1].
+	
+
+Now define WLClassify with the following algorithm:
+1.	Initialization: 
+	Let u_ij0= 1/(s0y0), meaning all statistics are equally important at first.
+	Let w_i0=1/n, meaning all players are equally likely to be chosen
+	
+2. Perturb U by adding/subtracting random numbers to each entry, m times. 
+	For each of m perturbations, let u_ij(k+1)= u_ijk+λ*r_ijk, where k+1 indicates the next iteration subscript and r is a new random number for each perturbation.
+	
+3. Calculate c_i based on stats (perturbation # and iteration # omitted here)
+	c_i'= (sum over j,k of u_jk*s_ijk)
+	To scale c_i', so that sum over c_i is one, use 
+		c_i=(c_i'+c'min)/(cTot+n*c'min)
+		
+4. Evaluate newly calculated probability c_i using the following formula:
+	τ(c_i)=(sum over all perturbations j except i, evaluated l times of v(x(c_i), x(c_j))/l)
+
+5. Max value over all τ determines next probability w.
+
+6. Determine whether min has been reached (tbd), If not reached, go back to step 2.

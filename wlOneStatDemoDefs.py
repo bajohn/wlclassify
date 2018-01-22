@@ -1,14 +1,15 @@
 import wlMain as wl
 import numpy as np
 
+
 class WlOneStat(wl.WlClassify):
     # first index is stat id, second index is timestamp id
 
-    def __init__(self):
+    def __init__(self, hyperParams):
         self.players = self.makePlayers(10)
         self.playerStats = self.generateStats()
-        
-        super().__init__(self.playerStats, self.evaluatePicks)
+
+        super().__init__(self.playerStats, self.evaluatePicks, hyperParams)
 
     def generateStats(self):
         """
@@ -18,7 +19,7 @@ class WlOneStat(wl.WlClassify):
         playerStatsOut = []
         for player in self.players:
             arrayToAppend = []
-            playerAvg = 10*(player+1)  # mean to center normal distr about
+            playerAvg = 10 * (player + 1)  # mean to center normal distr about
             variance = 2  # variance for normal distribution
             yearsBack = 0
             while yearsBack < 3:
@@ -29,20 +30,19 @@ class WlOneStat(wl.WlClassify):
             playerStatsOut.append(arrayToAppend)
         return playerStatsOut
 
-
     def makePlayers(self, numberOfPlayers):
         """
-        generate array of player labels in an array, [0,1,2,...,numberOfPlayers]
+        generate array of player labels in an array,
+        [0,1,2,...,numberOfPlayers]
         """
         returnArr = []
         for player in range(numberOfPlayers):
             returnArr.append(player)
         return returnArr
 
-
     def evaluatePicks(self, picksA, picksB, playerStats):
         """
-        for the competition in this demo, two 
+        for the competition in this demo, two
         picks of players compete against each other.
         sum the most recent stat
         value for each player in each pick; the highest sum wins
@@ -50,13 +50,17 @@ class WlOneStat(wl.WlClassify):
         picksAVal = 0
         picksBVal = 0
         if(len(picksA) != len(picksB)):
-             raise Exception('picks to evaluate must be same length')
-        for a in range(0, picksA):
-            picksAVal += playerStats[a][0] # add most recent stat value
-            picksBVal += playerStats[b][0] 
+            raise Exception('picks to evaluate must be same length')
+        for a in picksA:
+            picksAVal += playerStats[a][0][0]  # add most recent stat value
+        for b in picksB:
+            picksBVal += playerStats[b][0][0]
+
+        print(picksAVal < picksBVal)
         if picksAVal == picksBVal:
-            return 0 # tie
+            return 0  # tie
         elif picksAVal > picksBVal:
-            return 1 # pick A beats pick B
+            return 1  # pick A beats pick B
         elif picksAVal < picksBVal:
-            return -1 # pick B beats pick A
+            print('yep')
+            return -1  # pick B beats pick A

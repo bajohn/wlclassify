@@ -13,7 +13,7 @@ import numpy as np
 
 class WlClassify:
 
-    def __init__(self, playerStats, pickEvaluator, hyperParams):
+    def __init__(self, params, hyperParams):
         """
         Generate initial weights for player stats.
         The initial weights are all the same, meaning
@@ -22,20 +22,21 @@ class WlClassify:
         amount of data, we use the player indexed at 0
         to calculate the appropriate weight.
         """
-        playerStats0 = playerStats[0]
-        yearCount = len(playerStats[0])
-        statCount = len(playerStats[0][0])
-        initialWeight = 1 / (yearCount * statCount)
 
         # store variables
-        self.pickEvaluator = pickEvaluator
-        self.playerStats = playerStats
+        self.pickEvaluator = params['pickEvaluator']
+        self.pickMaker = params['pickMaker']
+        self.playerStats = params['playerStats']
         self.hyperParams = hyperParams
 
-        self.__testVar = 3
+        # Indices for playerStats[a][b][c]:
+        # a=player number, b=timestamp, c=stat category
+        timeCount = len(self.playerStats[0])
+        statCount = len(self.playerStats[0][0])
+        initialWeight = 1 / (timeCount * statCount)
 
         # first index is stat id, second index is timestamp id
-        self.statWeights = np.full((statCount, yearCount), initialWeight)
+        self._statWeights = np.full((timeCount, statCount), initialWeight)
 
     @property
     def hyperParams(self):
@@ -52,6 +53,50 @@ class WlClassify:
     def execEval(self, picksA, picksB):
         return self.pickEvaluator(picksA, picksB, self.playerStats)
 
+    def perturbWeight(self):
+        # generate a single perturbation of the current statWeights
+        learnRate = self.hyperParams['learnRate']
+        retWeights = []
+        for statCat in self._statWeights:
+            curArr = []
+            for idx in range(len(statCat)):
+                delta = 2 * (np.random.random_sample() - .5) * learnRate
+                curArr.append(statCat[idx] + delta)
+            retWeights.append(curArr)
+        return retWeights
+
+    def calcPickWeights(self, weightsIn):
+        # given new statWeights weightsIn, calculate the
+        # c_i probability of picking the ith player
+
+        rawPickWeights = []
+        finalPickWeights = []  # ith position is probability for ith player
+        minPickWeight = 99999999999
+        sumOfWeights = 0
+        playerIdx = 0
+        for player in self.playerStats:
+            curRawWeight = 0
+            timeIdx = 0
+            for timerow in player:
+                statIdx = 0
+                for statVal in timerow:
+                    curRawWeight += weightsIn[timeIdx][statIdx] * statVal
+                    statIdx += 1
+                timeIdx += 1
+
+            rawPickWeights.append(curRawWeight)
+            sumOfWeights += curRawWeight
+            if curRawWeight < minPickWeight:
+                minPickWeight = curRawWeight
+
+        for weightIdx in range(len(rawPickWeights)):
+            rawWeight = rawPickWeights[weightIdx]
+            finalWeight = (rawWeight + minPickWeight) / \
+                (sumOfWeights + len(self.playerStats) * minPickWeight)
+
+            finalPickWeights.append(finalWeight)
+        return finalPickWeights
+
     def printStats(self):
         # print player stats; after initialization these
         # will remain constant
@@ -59,4 +104,4 @@ class WlClassify:
 
     def printWeights(self):
         # print current weights applied to player stats
-        print(self.statWeights)
+        print(self._statWeights)

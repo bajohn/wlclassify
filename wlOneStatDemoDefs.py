@@ -8,8 +8,11 @@ class WlOneStat(wl.WlClassify):
     def __init__(self, hyperParams):
         self.players = self.makePlayers(10)
         self.playerStats = self.generateStats()
-
-        super().__init__(self.playerStats, self.evaluatePicks, hyperParams)
+        params = {
+            'pickEvaluator': self.evaluatePicks,
+            'playerStats': self.playerStats,
+            'pickMaker': self.pickMaker}
+        super().__init__(params, hyperParams)
 
     def generateStats(self):
         """
@@ -56,11 +59,12 @@ class WlOneStat(wl.WlClassify):
         for b in picksB:
             picksBVal += playerStats[b][0][0]
 
-        print(picksAVal < picksBVal)
         if picksAVal == picksBVal:
             return 0  # tie
         elif picksAVal > picksBVal:
             return 1  # pick A beats pick B
         elif picksAVal < picksBVal:
-            print('yep')
             return -1  # pick B beats pick A
+
+    def pickMaker(self, playerWeights):
+        return True

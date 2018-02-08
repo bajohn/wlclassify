@@ -24,8 +24,8 @@ class WlClassify:
         """
 
         # store variables
-        self.pickEvaluator = params['pickEvaluator']
-        self.pickMaker = params['pickMaker']
+        # self.pickEvaluator = params['pickEvaluator'] #dont need these...
+        # self.pickMaker = params['pickMaker']
         self.playerStats = params['playerStats']
         self.hyperParams = hyperParams
 
@@ -50,6 +50,10 @@ class WlClassify:
                 raise Exception('Missing "' + required + '" hyperparameter.')
         self._hyperParams = hyperParams
 
+    def pickMaker(self, pickWeights):
+        raise NotImplementedError('This needs to be overwritten')
+    def pickEvaluator(self, picksA, picksB, playerStats):
+        raise NotImplementedError('This needs to be overwritten')
     def execEval(self, picksA, picksB):
         return self.pickEvaluator(picksA, picksB, self.playerStats)
 
@@ -99,10 +103,11 @@ class WlClassify:
 
     def evaluatePickWeights(self, pickWeights1, pickWeights2):
         # hyperparams: 'batchSize'
-        print(self.hyperparams)
+        print(self.hyperParams)
         score = 0
 
-        for i in range(self.hyperparams['batchSize']):
+        for i in range(self.hyperParams['batchSize']):
+
             pick1 = self.pickMaker(pickWeights1)
             pick2 = self.pickMaker(pickWeights2)
             score += self.execEval(pick1, pick2)

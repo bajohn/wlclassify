@@ -8,6 +8,7 @@ class WlOneStat(wl.WlClassify):
     def __init__(self, hyperParams):
         self.players = self.makePlayers(10)
         self.playerStats = self.generateStats()
+        # todo: delete these params, should overwrite instead of pass
         params = {
             'pickEvaluator': self.evaluatePicks,
             'playerStats': self.playerStats,

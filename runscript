@@ -1,5 +1,5 @@
 #!/bin/bash 
-
+# apply pep8 styling, check for pep8 compliance, then execute unit tests
 autopep8 ../wlclassifyhome/ -i -r
 pycodestyle ../wlclassifyhome/
 /usr/bin/python3 wlUnitTests.py

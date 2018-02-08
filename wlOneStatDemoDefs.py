@@ -67,4 +67,32 @@ class WlOneStat(wl.WlClassify):
             return -1  # pick B beats pick A
 
     def pickMaker(self, playerWeights):
-        return True
+        """
+        For the competition in this demo, simply pick any 3 players. 
+        Assume playerWeights is an array where each entry is the weight
+        to place on the nth player, like [.01, .02, .07] (must sum to 1)
+        """
+        boundaryArr = [] # takes form [.01, .03, 1.0] for use with RNG on [0,1)
+        lastBoundary = 0
+        for entry in playerWeights:
+            newBoundary = lastBoundary + entry
+            boundaryArr.append(newBoundary)
+            lastBoundary = newBoundary
+        
+        playerArr = []
+        thisPick = 99
+        while len(playerArr) < 3:
+            randNum = np.random.random_sample()
+            for playerIdx in range(len(boundaryArr)):
+                if playerIdx == 0 and randNum <  boundaryArr[playerIdx]:
+                    thisPick = playerIdx
+                    break
+                elif randNum < boundaryArr[playerIdx] and randNum > boundaryArr[playerIdx-1]:
+                    thisPick = playerIdx
+                    break
+                
+            # cannot repeat a pick:
+            if thisPick not in playerArr:
+                playerArr.append(thisPick)
+        playerArr.sort()
+        return playerArr

@@ -65,8 +65,8 @@ class WlClassify:
             retWeights.append(curArr)
         return retWeights
 
-    def calcPickWeights(self, weightsIn):
-        # given new statWeights weightsIn, calculate the
+    def calcPickWeights(self, statWeightsIn):
+        # given new statWeightsIn, calculate the
         # c_i probability of picking the ith player
 
         rawPickWeights = []
@@ -80,7 +80,7 @@ class WlClassify:
             for timerow in player:
                 statIdx = 0
                 for statVal in timerow:
-                    curRawWeight += weightsIn[timeIdx][statIdx] * statVal
+                    curRawWeight += statWeightsIn[timeIdx][statIdx] * statVal
                     statIdx += 1
                 timeIdx += 1
 
@@ -97,6 +97,17 @@ class WlClassify:
             finalPickWeights.append(finalWeight)
         return finalPickWeights
 
+    def evaluatePickWeights(self, pickWeights1, pickWeights2):
+        # hyperparams: 'batchSize'
+        print(self.hyperparams)
+        score = 0
+
+        for i in range(self.hyperparams['batchSize']):
+            pick1 = self.pickMaker(pickWeights1)
+            pick2 = self.pickMaker(pickWeights2)
+            score += self.execEval(pick1, pick2)
+        
+        return score
     def printStats(self):
         # print player stats; after initialization these
         # will remain constant

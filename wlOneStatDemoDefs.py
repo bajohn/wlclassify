@@ -10,9 +10,8 @@ class WlOneStat(wl.WlClassify):
         self.playerStats = self.generateStats()
         # todo: delete these params, should overwrite instead of pass
         params = {
-            'pickEvaluator': self.evaluatePicks,
-            'playerStats': self.playerStats,
-            'pickMaker': self.pickMaker}
+            'playerStats': self.playerStats
+        }
         super().__init__(params, hyperParams)
 
     def generateStats(self):
@@ -44,7 +43,7 @@ class WlOneStat(wl.WlClassify):
             returnArr.append(player)
         return returnArr
 
-    def evaluatePicks(self, picksA, picksB, playerStats):
+    def pickEvaluator(self, picksA, picksB, playerStats):
         """
         for the competition in this demo, two
         picks of players compete against each other.

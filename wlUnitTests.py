@@ -9,7 +9,10 @@ class TestWL(unittest.TestCase):
         hyperParams = {
             'learnRate': .1,
             'perturbs': 10,  # number of perturbations per iteration
-            'batchSize': 100  # number of runs per perturbation
+            'batchSize': 100,  # number of runs per perturbation
+            # how long to run the algorithm for; should eventually
+            # determine this convergence programmatically.
+            'iterations': 10 
         }
         self._wlOneLoc = wlOne.WlOneStat(hyperParams)  # initialize
         print('Setting up test.')
@@ -80,7 +83,12 @@ class TestWL(unittest.TestCase):
         self.assertTrue(result31 <= result32)
         self.assertTrue(result32 < 0 )
         self.assertTrue(result12 > 0)
-        self.assertTrue(result12 >= result23)
+        self.assertTrue(result13 >= result23)
         self.assertTrue(result23 > 0 )
+
+
+    def testIterateAlgorithm(self):
+        # todo: since trying to find 
+        self._wlOneLoc.iterateAlgorithm()
         
 unittest.main()

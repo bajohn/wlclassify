@@ -44,7 +44,7 @@ class WlClassify:
 
     @hyperParams.setter
     def hyperParams(self, hyperParams):
-        requiredParams = ['learnRate', 'perturbs', 'batchSize']
+        requiredParams = ['learnRate', 'perturbs', 'batchSize', 'iterations']
         for required in requiredParams:
             if required not in hyperParams:
                 raise Exception('Missing "' + required + '" hyperparameter.')
@@ -72,7 +72,9 @@ class WlClassify:
     def calcPickWeights(self, statWeightsIn):
         # given new statWeightsIn, calculate the
         # c_i probability of picking the ith player
-
+        # The weights must always add to 1. This was written to guarantee 
+        # this, and is checked in unit test but not checked every time
+        # this method is called.
         rawPickWeights = []
         finalPickWeights = []  # ith position is probability for ith player
         minPickWeight = 99999999999
@@ -103,7 +105,6 @@ class WlClassify:
 
     def evaluatePickWeights(self, pickWeights1, pickWeights2):
         # hyperparams: 'batchSize'
-        print(self.hyperParams)
         score = 0
 
         for i in range(self.hyperParams['batchSize']):
@@ -114,6 +115,54 @@ class WlClassify:
         return score
 
 
+    def iterateAlgorithm(self):
+        print('stats to evaluate on')
+        self.printStats()
+        # This method under construction
+        for i in range(0, self.hyperParams['iterations']):
+            print('cur iteration', i)
+            print('cur weights', self._statWeights)
+            self.singleIteration()
+
+
+    def singleIteration(self):
+        # This method under construction
+        # todo: make sure it takes into account multiple stats
+        statWeightsLoc = [] # new stat weights to evaluate
+        pickWeightsLoc = [] # new player pick weights to evaluate
+        idxMax = self.hyperParams['perturbs']
+        for idx in range(0, idxMax):
+            # rename these! confusing
+            statWeightLoc = self.perturbWeight()
+            statWeightsLoc.append(statWeightLoc)
+            pickWeightLoc = self.calcPickWeights(statWeightLoc)
+            pickWeightsLoc.append(pickWeightLoc)
+        
+        # print(pickWeights)
+        # todo: add error handling here- what if best idx isn't found, what 
+        # should maxScore be initialized at 
+        # todo: more efficient if A v B isn't repeated with B v A
+        maxScore = -999999999
+        bestIdx = -1
+        for outerIdx in range(0, idxMax):
+            curScore = 0
+            for innerIdx in range(0, idxMax):
+                # Score how well outerIdx fares against innerIdx
+                # Add this score to the current total
+                curScore += self.evaluatePickWeights(pickWeightsLoc[outerIdx], pickWeightsLoc[innerIdx])
+            if curScore > maxScore:
+                maxScore = curScore
+                bestIdx = outerIdx
+        print('winner score', maxScore)
+        # iteration complete, store winner as new stat weight
+        self._statWeights = statWeightsLoc[bestIdx]
+
+
+
+
+
+
+        
     def printStats(self):
         # print player stats; after initialization these
         # will remain constant

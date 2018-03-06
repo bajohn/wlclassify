@@ -26,6 +26,8 @@ class WlOneStat(wl.WlClassify):
             variance = 2  # variance for normal distribution
             yearsBack = 0
             while yearsBack < 3:
+                # todo: add yearsBack to this calculation to make the algorithm have 
+                # some data to play with 
                 statToAppend = np.random.normal(playerAvg, variance)
                 if statToAppend > 0:
                     yearsBack += 1

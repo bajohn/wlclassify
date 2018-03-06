@@ -111,8 +111,9 @@ class WlClassify:
             pick1 = self.pickMaker(pickWeights1)
             pick2 = self.pickMaker(pickWeights2)
             score += self.execEval(pick1, pick2)
-        
         return score
+
+
     def printStats(self):
         # print player stats; after initialization these
         # will remain constant

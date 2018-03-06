@@ -12,7 +12,7 @@ class TestWL(unittest.TestCase):
             'batchSize': 100  # number of runs per perturbation
         }
         self._wlOneLoc = wlOne.WlOneStat(hyperParams)  # initialize
-        print('setting up')
+        print('Setting up test.')
         # wlOneLoc.printStats()
         # wlOneLoc.printWeights()
 
@@ -59,11 +59,28 @@ class TestWL(unittest.TestCase):
             self.assertTrue(player in range(len(playerWeights)))
         
     def testEvaluatePickWeights(self):
+        # playerWeights1 are superior weights to playerWeights3
+        # playerWeights2 are random.
+        # Therefore we assert over batchSize of 100 that,
+        # performance-wise, playerWeights1 > playerWeights2 > playerWeights3
         playerWeights1 = [0,0,0,0,0,0,0,.3,.3,.4]
-        playerWeights2 = [.3,.3,.4,0,0,0,0,0,0,0]
-        
-        result = self._wlOneLoc.evaluatePickWeights(playerWeights1, playerWeights2)
-        print(result)
-        
+        playerWeights2 = [.1,.1,.1,.1,.1,.1,.1,.1,.1,.1]
+        playerWeights3 = [.3,.3,.4,0,0,0,0,0,0,0]
+
+        result12 = self._wlOneLoc.evaluatePickWeights(playerWeights1, playerWeights2)
+        result13 = self._wlOneLoc.evaluatePickWeights(playerWeights1, playerWeights3)
+        result23 = self._wlOneLoc.evaluatePickWeights(playerWeights2, playerWeights3)
+
+        # assert symmetry 
+        result21 = self._wlOneLoc.evaluatePickWeights(playerWeights2, playerWeights1)
+        result31 = self._wlOneLoc.evaluatePickWeights(playerWeights3, playerWeights1)
+        result32 = self._wlOneLoc.evaluatePickWeights(playerWeights3, playerWeights2)
+        print(result12, result13, result23, result21, result31, result32)
+        self.assertTrue(result21 < 0)
+        self.assertTrue(result31 <= result32)
+        self.assertTrue(result32 < 0 )
+        self.assertTrue(result12 > 0)
+        self.assertTrue(result12 >= result23)
+        self.assertTrue(result23 > 0 )
         
 unittest.main()

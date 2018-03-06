@@ -81,7 +81,7 @@ class WlOneStat(wl.WlClassify):
         
         playerArr = []
         thisPick = 99
-        while len(playerArr) < 3:
+        while len(playerArr) < 3: # this game assumes 3 player picks.
             randNum = np.random.random_sample()
             for playerIdx in range(len(boundaryArr)):
                 if playerIdx == 0 and randNum <  boundaryArr[playerIdx]:

@@ -146,21 +146,18 @@ class WlClassify:
         maxScore = -999999999
         bestIdx = -1
 
-        testArr = []
         for outerIdx in range(0, idxMax):
-            curScore = 0
+            
             for innerIdx in range(0, idxMax):
+                curScore = 0
                 # Score how well outerIdx fares against innerIdx
                 # Add this score to the current total
                 curScore += self.evaluatePickWeights(pickWeightsLoc[outerIdx], pickWeightsLoc[innerIdx])
-            
-            testArr.append(curScore)
-            if curScore > maxScore:
-                maxScore = curScore
-                bestIdx = outerIdx
+                if curScore > maxScore:
+                    maxScore = curScore
+                    bestIdx = outerIdx
 
-        if maxScore < 0:
-            print('winner score negative', maxScore, testArr)
+        print('winner score', maxScore)
         # iteration complete, store winner as new stat weight
         self._statWeights = statWeightsLoc[bestIdx]
 

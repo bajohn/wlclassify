@@ -7,12 +7,12 @@ class TestWL(unittest.TestCase):
 
     def setUp(self):
         hyperParams = {
-            'learnRate': .05,
+            'learnRate': .01,
             'perturbs': 10,  # number of perturbations per iteration
             'batchSize': 10,  # number of runs per perturbation
             # how long to run the algorithm for; should eventually
             # determine this convergence programmatically.
-            'iterations': 1000 
+            'iterations': 1000 *400 
         }
         self._wlOneLoc = wlOne.WlOneStat(hyperParams)  # initialize
         print('Setting up test.')

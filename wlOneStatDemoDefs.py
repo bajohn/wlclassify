@@ -28,10 +28,15 @@ class WlOneStat(wl.WlClassify):
             while yearsBack < 3:
                 # todo: add yearsBack to this calculation to make the algorithm have 
                 # some data to play with 
-                statToAppend = np.random.normal(playerAvg, variance)
-                if statToAppend > 0:
+                if yearsBack == 1:
+                    # make one of the stats uniform, so worthless
                     yearsBack += 1
-                    arrayToAppend.append([statToAppend])
+                    arrayToAppend.append([1])
+                else:
+                    statToAppend = np.random.normal(playerAvg, variance)
+                    if statToAppend > 0:
+                        yearsBack += 1
+                        arrayToAppend.append([statToAppend])
             playerStatsOut.append(arrayToAppend)
         return playerStatsOut
 
@@ -82,7 +87,7 @@ class WlOneStat(wl.WlClassify):
             lastBoundary = newBoundary
         
         playerArr = []
-        thisPick = 99
+        thisPick = 99999
         while len(playerArr) < 3: # this game assumes 3 player picks.
             randNum = np.random.random_sample()
             for playerIdx in range(len(boundaryArr)):

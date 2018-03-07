@@ -65,7 +65,8 @@ class WlClassify:
             curArr = []
             for idx in range(len(statCat)):
                 delta = 2 * (np.random.random_sample() - .5) * learnRate
-                curArr.append(statCat[idx] + delta)
+                newWeight = max(statCat[idx] + delta, 0) # keep weight >= 0
+                curArr.append(newWeight)
             retWeights.append(curArr)
         return retWeights
 
@@ -144,16 +145,22 @@ class WlClassify:
         # todo: more efficient if A v B isn't repeated with B v A
         maxScore = -999999999
         bestIdx = -1
+
+        testArr = []
         for outerIdx in range(0, idxMax):
             curScore = 0
             for innerIdx in range(0, idxMax):
                 # Score how well outerIdx fares against innerIdx
                 # Add this score to the current total
                 curScore += self.evaluatePickWeights(pickWeightsLoc[outerIdx], pickWeightsLoc[innerIdx])
+            
+            testArr.append(curScore)
             if curScore > maxScore:
                 maxScore = curScore
                 bestIdx = outerIdx
-        print('winner score', maxScore)
+
+        if maxScore < 0:
+            print('winner score negative', maxScore, testArr)
         # iteration complete, store winner as new stat weight
         self._statWeights = statWeightsLoc[bestIdx]
 

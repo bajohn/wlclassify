@@ -1,0 +1,6 @@
+Result from wlUnitTest, with input stats defined so the first and third are significant, but the second is not.
+
+Running this algorithm successfully weighted the first and third heavily and the second significantly less.
+
+cur iteration 399900
+cur weights [[4.477499242711289], [0.2954575761597452], [5.190654958606774]]

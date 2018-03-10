@@ -121,8 +121,9 @@ class WlClassify:
         self.printStats()
         # This method under construction
         for i in range(0, self.hyperParams['iterations']):
-            print('cur iteration', i)
-            print('cur weights', self._statWeights)
+            if i % 100 == 0:
+                print('cur iteration', i)
+                print('cur weights', self._statWeights)
             self.singleIteration()
 
 
@@ -157,7 +158,7 @@ class WlClassify:
                     maxScore = curScore
                     bestIdx = outerIdx
 
-        print('winner score', maxScore)
+        # print('winner score', maxScore)
         # iteration complete, store winner as new stat weight
         self._statWeights = statWeightsLoc[bestIdx]
 
